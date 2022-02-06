@@ -2,27 +2,50 @@ package cu.edu.cujae.inf
 
 
 
-class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Array [Int], actPath: Array [Int] ) {
-  private val board = Array ofDim [Boolean] (numbOfRows, numberOfCol)
+class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: (Int, Int), actPath: Array [ (Int, Int) ] ) {
+  val board: Array [Array [Tile] ] = Array ofDim [Tile] (numbOfRows, numberOfCol)
+  calcTilesWeight ()
 
 
-  def activatePath (): Unit = {
+  def activatePath (): Boolean = {
+    for (i <- actPath) {
+      val t:Tile = board apply i
 
+      t.active = true
+    }
+
+    /* ToDo Validar que el camino conecte la salida con la meta */
+
+    false
   }
 
-  def distance (aTile: Array [Int], anTile: Array [Int] ): Unit = {
+  //Listo listoni
+  def possibleTiles (aTile: (Int, Int) ): Array [Tile] = {
+    val a = new Array [Tile] (4)
 
+    a (0) = board apply (aTile._1 + 1, aTile._2)
+    a (1) = board apply (aTile._1 - 1, aTile._2)
+    a (2) = board apply (aTile._1, aTile._2 + 1)
+    a (3) = board apply (aTile._1, aTile._2 - 1)
+
+    a.filter (_.active)
   }
 
-  def isTileActive (aTile: Array [Int] ): Unit = {
 
+  //Listo Listoni
+  private def calcTilesWeight (): Unit = {
+    for (i <- actPath) {
+      val t: Tile = board apply i
+
+      t.weight = distanceToGoal (board apply i)
+    }
   }
 
-  def allocateObject (obj: AnyRef): Unit = {
+  //Listo Listoni
+  private def distanceToGoal (aTile: (Int, Int) ): Int = {
+    val xDist = Math.abs (goal._1 - aTile._1)
+    val yDist = Math.abs (goal._2 - aTile._2)
 
-  }
-
-  def calcTilesWeigth (): Unit = {
-
+    xDist + yDist
   }
 }
