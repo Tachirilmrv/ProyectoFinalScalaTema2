@@ -2,14 +2,21 @@ package cu.edu.cujae.inf
 
 
 
-class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: (Int, Int), actPath: Array [ (Int, Int) ] ) {
-  val board: Array [Array [Tile] ] = Array ofDim [Tile] (numbOfRows, numberOfCol)
+class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath: Array [ (Int, Int) ] ) {
+  val board: Array [Array [Tile] ] = Array ofDim [Tile] (numbOfRows + 1, numberOfCol + 1)
+
+  for (i <- board.indices; j <- board (i).indices) {
+    if (actPath.contains ( (i, j) ) )
+      board (i) (j) = new Tile (i, j, true)
+    else
+      board (i) (j) = new Tile (i, j, false)
+  }
   calcTilesWeight ()
 
-
+  //Listo Listoni
   def activatePath (): Boolean = {
     for (i <- actPath) {
-      val t:Tile = board apply i
+      val t:Tile = board (i._1) (i._2)
 
       t.active = true
     }
@@ -23,28 +30,33 @@ class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: (Int, Int), ac
   def possibleTiles (aTile: (Int, Int) ): Array [Tile] = {
     val a = new Array [Tile] (4)
 
-    a (0) = board apply (aTile._1 + 1, aTile._2)
-    a (1) = board apply (aTile._1 - 1, aTile._2)
-    a (2) = board apply (aTile._1, aTile._2 + 1)
-    a (3) = board apply (aTile._1, aTile._2 - 1)
+    a (0) = board (aTile._1 + 1) (aTile._2)
+    a (1) = board (aTile._1 - 1) (aTile._2)
+    a (2) = board (aTile._1) (aTile._2 + 1)
+    a (3) = board (aTile._1) (aTile._2 - 1)
 
     a.filter (_.active)
+  }
+
+  //Listo Listoni
+  def len (): Int = {
+    numbOfRows * numberOfCol
   }
 
 
   //Listo Listoni
   private def calcTilesWeight (): Unit = {
     for (i <- actPath) {
-      val t: Tile = board apply i
+      val t: Tile = board (i._1) (i._2)
 
-      t.weight = distanceToGoal (board apply i)
+      t.weight = distanceToGoal (i)
     }
   }
 
   //Listo Listoni
   private def distanceToGoal (aTile: (Int, Int) ): Int = {
-    val xDist = Math.abs (goal._1 - aTile._1)
-    val yDist = Math.abs (goal._2 - aTile._2)
+    val xDist = Math.abs (goal.location._1 - aTile._1)
+    val yDist = Math.abs (goal.location._2 - aTile._2)
 
     xDist + yDist
   }
