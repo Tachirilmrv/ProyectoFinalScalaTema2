@@ -3,7 +3,7 @@ package cu.edu.cujae.inf
 
 
 class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath: Array [ (Int, Int) ] ) {
-  val board: Array [Array [Tile] ] = Array ofDim [Tile] (numbOfRows + 1, numberOfCol + 1)
+  val board: Array [Array [Tile] ] = Array ofDim [Tile] (numbOfRows + 2, numberOfCol + 2)
 
   for (i <- board.indices; j <- board (i).indices) {
     if (actPath.contains ( (i, j) ) )
@@ -11,9 +11,10 @@ class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath:
     else
       board (i) (j) = new Tile (i, j, false)
   }
+
   calcTilesWeight ()
 
-  //Listo Listoni
+
   def activatePath (): Boolean = {
     for (i <- actPath) {
       val t:Tile = board (i._1) (i._2)
@@ -26,7 +27,6 @@ class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath:
     false
   }
 
-  //Listo listoni
   def possibleTiles (aTile: (Int, Int) ): Array [Tile] = {
     val a = new Array [Tile] (4)
 
@@ -38,13 +38,11 @@ class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath:
     a.filter (_.active)
   }
 
-  //Listo Listoni
   def len (): Int = {
     numbOfRows * numberOfCol
   }
 
 
-  //Listo Listoni
   private def calcTilesWeight (): Unit = {
     for (i <- actPath) {
       val t: Tile = board (i._1) (i._2)
@@ -53,7 +51,6 @@ class Board (val numbOfRows: Int, val numberOfCol: Int, val goal: Tile, actPath:
     }
   }
 
-  //Listo Listoni
   private def distanceToGoal (aTile: (Int, Int) ): Int = {
     val xDist = Math.abs (goal.location._1 - aTile._1)
     val yDist = Math.abs (goal.location._2 - aTile._2)

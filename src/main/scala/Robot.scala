@@ -1,7 +1,6 @@
 package cu.edu.cujae.inf
 
-import java.io.{FileNotFoundException, PrintWriter}
-import java.util.Date
+import java.io.PrintWriter
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -18,7 +17,7 @@ class Robot (val initialPosition: Tile, val board: Board) {
     var reachedGoal = false
     val bifurc = new mutable.Stack [Tile] ()
 
-    while (!reachedGoal && maxMoves > 0) {
+    while (!reachedGoal) {
       val posMoves = possibleMoves ()
 
       if (posMoves.length > 1) {
@@ -40,14 +39,13 @@ class Robot (val initialPosition: Tile, val board: Board) {
     }
   }
 
-  //Listo Listoni
   def walk (aTile: Tile): Unit = {
     if (maxMoves < 0) {
-      println ("Bot ran out of possible steps")
+      println ("Bot ran out of possible moves")
       System.exit (1)
     }
 
-    val moves = Array (currentPosition.location, aTile.location)
+    val moves = Array( (currentPosition.location._1 - 1, currentPosition.location._2 - 1), (aTile.location._1 - 1, aTile.location._2 - 1) )
 
     currentPosition = aTile
     maxMoves -= 1
@@ -56,23 +54,22 @@ class Robot (val initialPosition: Tile, val board: Board) {
     registerMove (moves)
   }
 
-  def returnTo (atile: Tile): Unit = {
+  def returnTo (aTile: Tile): Unit = {
     val t = traveledPath.reverse
 
     for (i <- t.indices) {
-      var j = t (i) (0)
+      val j = t (i)(0)
 
-      if (currentPosition.location != atile.location) {
-        walk (board.board (j._1) (j._2) )
+      if (currentPosition.location != aTile.location) {
+        walk (board.board (j._1 + 1) (j._2 + 1) )
 
         val lastPos = traveledPath.last (0)
 
-        board.board (lastPos._1) (lastPos._2).weight += 1
+        board.board (lastPos._1 + 1) (lastPos._2 + 1).weight += 1
       }
     }
   }
 
-  //Listo listoni
   def possibleMoves (): Array [Tile] = {
     val possM = board.possibleTiles (currentPosition.location)
     val weights = possM.map (_.weight)
@@ -81,13 +78,14 @@ class Robot (val initialPosition: Tile, val board: Board) {
     possM.filter (_.weight == minWeight)
   }
 
-  //Listo listoni
   def registerMove (move: Array [ (Int, Int) ] ): Unit = {
     traveledPath += move
   }
 
   def exportCSV (): Unit = {
     val out = new PrintWriter ("walks/path.csv")
+
+    out.println("Posición actual, Posición siguiente")
 
     for (i <- traveledPath) {
       out.println (s"${i (0)._1};${i (0)._2}, ${i (1)._1};${i (1)._2}")
